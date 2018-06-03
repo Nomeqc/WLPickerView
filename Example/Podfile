@@ -1,0 +1,11 @@
+use_frameworks!
+
+target 'WLPickerView_Example' do
+  pod 'WLPickerView', :path => '../'
+
+  target 'WLPickerView_Tests' do
+    inherit! :search_paths
+
+    
+  end
+end
