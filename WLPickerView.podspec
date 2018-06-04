@@ -31,6 +31,7 @@ TODO: Add long description of the pod here.
   s.ios.deployment_target = '8.0'
 
   s.source_files = 'WLPickerView/Classes/**/*'
+  s.public_header_files = 'WLPickerView/Classes/**/*.h'
   
   # s.resource_bundles = {
   #   'WLPickerView' => ['WLPickerView/Assets/*.png']

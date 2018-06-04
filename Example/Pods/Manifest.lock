@@ -1,0 +1,16 @@
+PODS:
+  - WLPickerView (0.1.0)
+
+DEPENDENCIES:
+  - WLPickerView (from `../`)
+
+EXTERNAL SOURCES:
+  WLPickerView:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  WLPickerView: df34008f9c5ec69a19274e34553214f0b4eb3553
+
+PODFILE CHECKSUM: 336e765899e25d9a9ab7432533e60b580856673a
+
+COCOAPODS: 1.5.0
