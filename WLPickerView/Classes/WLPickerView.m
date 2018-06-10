@@ -29,7 +29,9 @@ static CGFloat const kToolBarViewHeight = 44.f;
     if (!self) {
         return nil;
     }
+    self.backgroundColor = [UIColor whiteColor];
     _nodes = [nodes copy];
+    _rememberLastPick = YES;
     _columnCount = 3;
     _descriptionSeparator = @"-";
     UIToolbar *toolBar = ({
@@ -59,15 +61,22 @@ static CGFloat const kToolBarViewHeight = 44.f;
     return self;
 }
 
-- (void)updateSelectionWithComponentRowMap:(NSDictionary<NSNumber *,NSNumber *> *)componentRowMap {
+- (void)updateSelectionWithRowIndexes:(NSArray<NSNumber *> *)rowIndexes {
     [self.selectedRowIndexMap removeAllObjects];
-    for (NSInteger i = 0; i < self.columnCount; i ++) {
-       NSInteger row = [componentRowMap[@(i)] integerValue];
-        [self setSelectedRow:row forComponent:i];
-        [self.pickerView selectRow:row inComponent:i animated:NO];
-        [self.pickerView reloadComponent:i];
+    for (NSInteger columnIndex = 0; columnIndex < self.columnCount; columnIndex ++) {
+        if (columnIndex < rowIndexes.count) {
+            NSInteger row = [rowIndexes[columnIndex] integerValue];
+            [self setSelectedRow:row forComponent:columnIndex];
+            [self.pickerView selectRow:row inComponent:columnIndex animated:YES];
+            [self.pickerView reloadComponent:columnIndex];
+        } else {
+            [self setSelectedRow:0 forComponent:columnIndex];
+            [self.pickerView selectRow:0 inComponent:columnIndex animated:YES];
+            [self.pickerView reloadComponent:columnIndex];
+        }
     }
 }
+
 
 // MARK: Button Event Handler
 - (void)didTapCancelBarButton:(UIBarButtonItem *)barButtonItem {
@@ -77,17 +86,23 @@ static CGFloat const kToolBarViewHeight = 44.f;
 }
 
 - (void)didTapDoneBarButton:(UIBarButtonItem *)barButtonItem {
-    if (self.doneBarButtonTapHandler) {
-        NSMutableArray<NSString *> *selectedNodeNames = [NSMutableArray array];
-        for (NSInteger i = 0; i < self.columnCount; i++) {
-            NSInteger selectedRow = [self selectedRowInComponent:i];
-            WLPickerViewNode *node = [self nodeForRow:selectedRow forComponent:i];
+    NSMutableArray<NSString *> *selectedNodeNames = [NSMutableArray array];
+    NSMutableArray<NSNumber *> *selectedRowIndexes = [NSMutableArray array];
+    for (NSInteger i = 0; i < self.columnCount; i++) {
+        NSInteger selectedRow = [self selectedRowInComponent:i];
+        WLPickerViewNode *node = [self nodeForRow:selectedRow forComponent:i];
+        if (node) {
+            [selectedRowIndexes addObject:@(selectedRow)];
             if (node.nodeName.length > 0) {
                 [selectedNodeNames addObject:node.nodeName];
             }
         }
-        
-        self.doneBarButtonTapHandler(self,[self.selectedRowIndexMap copy],[selectedNodeNames componentsJoinedByString:self.descriptionSeparator]);
+    }
+    if (self.rememberLastPick) {
+        [self updateSelectionWithRowIndexes:selectedRowIndexes];
+    }
+    if (self.doneBarButtonTapHandler) {
+        self.doneBarButtonTapHandler(self, [selectedRowIndexes copy], [selectedNodeNames componentsJoinedByString:_descriptionSeparator? :@"-"]);
     }
 }
 
@@ -150,7 +165,7 @@ static CGFloat const kToolBarViewHeight = 44.f;
             //当前列行索引有变动，刷新所有后续的列
             for (NSInteger j = i + 1; j < self.columnCount; j++) {
                 [self setSelectedRow:0 forComponent:j];
-                [pickerView selectRow:0 inComponent:j animated:NO];
+                [pickerView selectRow:0 inComponent:j animated:YES];
                 [pickerView reloadComponent:j];
             }
             [pickerView setNeedsLayout];
@@ -163,20 +178,19 @@ static CGFloat const kToolBarViewHeight = 44.f;
 }
 
 // MARK: Helper
-
 - (WLPickerViewNode *)nodeForRow:(NSInteger)row forComponent:(NSInteger)component {
-    if (component == 0) {
-        return self.nodes[row];
+    WLPickerViewNode *node = nil;
+    ///从根级到当前级
+    for (NSInteger i = 0; i <= component; i++) {
+        NSInteger rowIndex = (i == component? row : [self selectedRowInComponent:i]);
+        if (i == 0) {
+            node = rowIndex < self.nodes.count? self.nodes[rowIndex] : nil;
+        } else {
+            node = rowIndex < node.childNodes.count? node.childNodes[rowIndex] : nil;
+        }
     }
-    NSInteger rootSelectedRowIndex = [self selectedRowInComponent:0];
-    WLPickerViewNode *node = self.nodes[rootSelectedRowIndex];
-    for (NSInteger i = 1; i < component; i++) {
-        NSInteger selectedRow = [self selectedRowInComponent:i];
-        node = node.childNodes[selectedRow];
-    }
-    return node.childNodes[row];
+    return node;
 }
-
 
 - (NSInteger)selectedRowInComponent:(NSInteger)component {
     return  [self.selectedRowIndexMap[@(component)] integerValue];

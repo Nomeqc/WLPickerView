@@ -55,31 +55,23 @@
         typeof(weakSelf) self = weakSelf;
         [self.textField endEditing:YES];
     }];
-    [pickerView setDoneBarButtonTapHandler:^(WLPickerView *pickerView,NSDictionary<NSNumber *,NSNumber *> *selectionUserInfo, NSString *description) {
+    [pickerView setDoneBarButtonTapHandler:^(WLPickerView *pickerView, NSArray<NSNumber *> *selectedRowIndexes, NSString *selectionDescription) {
         typeof(weakSelf) self = weakSelf;
         [self.textField endEditing:YES];
-        NSLog(@"%@",selectionUserInfo);
-        NSLog(@"result:%@",description);
-        self.textField.text = description;
-       [pickerView updateSelectionWithComponentRowMap:selectionUserInfo];
+        self.textField.text = selectionDescription;
+        NSLog(@"选中的行索引%@",selectedRowIndexes);
+        NSLog(@"选中结果:%@",selectionDescription);
     }];
-    
+
     pickerView.backgroundColor = [UIColor whiteColor];
     //显示三列
     pickerView.columnCount = 3;
-    //设置默认选中
-    [pickerView updateSelectionWithComponentRowMap:@{@(0): @(8),
-                                                     @(1): @(1),
-                                                     @(2): @(4)}];
+    
+    ///设置选中第0列选中索引为8,第1列选中索引为1,第2列选中索引为4
+    [pickerView updateSelectionWithRowIndexes:@[@(8),
+                                                @(1),
+                                                @(4)]];
     self.textField.inputView = pickerView;
-
-}
-
-
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
 }
 
 @end

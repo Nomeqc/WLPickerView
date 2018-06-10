@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'WLPickerView'
-  s.version          = '0.1.1'
+  s.version          = '1.0'
   s.summary          = 'Better PickerView,Easier to use.'
 
 # This description is used to generate tags and improve search results.

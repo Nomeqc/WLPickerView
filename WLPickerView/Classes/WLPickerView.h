@@ -16,14 +16,16 @@
 /// 列总数，默认为3
 @property (nonatomic) NSUInteger columnCount;
 
-///更新选中状态,key为component,value为row
-- (void)updateSelectionWithComponentRowMap:(NSDictionary<NSNumber *, NSNumber *> *)componentRowMap;
+///是否记住上次的选择，默认为YES
+@property (nonatomic) BOOL rememberLastPick;
+
+///更列对应选中的行的索引
+- (void)updateSelectionWithRowIndexes:(NSArray<NSNumber *> *)indexes;
 
 /// 选择完成描述分隔符，默认为"-"
 @property (nonatomic, copy) NSString *descriptionSeparator;
 
-/// 点击完成按钮点击处理
-@property (nonatomic, copy) void (^doneBarButtonTapHandler) (WLPickerView *pickerView, NSDictionary<NSNumber *, NSNumber *> *selectedComponentRowMap,NSString *selectionDescription);
+@property (nonatomic, copy) void (^doneBarButtonTapHandler) (WLPickerView *pickerView, NSArray<NSNumber *> *selectedRowIndexes, NSString *selectionDescription);
 
 ///取消按钮点击处理
 @property (nonatomic, copy) void (^cancelBarButtonTapHandler) (WLPickerView *pickerView) ;
