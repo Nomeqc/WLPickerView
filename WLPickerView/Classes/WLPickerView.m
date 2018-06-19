@@ -69,10 +69,6 @@ static CGFloat const kToolBarViewHeight = 44.f;
             [self setSelectedRow:row forComponent:columnIndex];
             [self.pickerView selectRow:row inComponent:columnIndex animated:YES];
             [self.pickerView reloadComponent:columnIndex];
-        } else {
-            [self setSelectedRow:0 forComponent:columnIndex];
-            [self.pickerView selectRow:0 inComponent:columnIndex animated:YES];
-            [self.pickerView reloadComponent:columnIndex];
         }
     }
 }
